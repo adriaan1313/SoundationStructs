@@ -17,8 +17,12 @@ types:
         type: str
         encoding: utf8
         size: title_len
-      - id: unk1
-        size: 6
+      - id: cut #the sample number it is able to cut off (default value)
+        type: u1
+      - id: num
+        type: u1
+      - id: unk2
+        size: 4
       - id: riff_magic #quite a janky way to do this, but i didn't want to import the whole riff wav struct
         size: 4
       - id: riff_len
