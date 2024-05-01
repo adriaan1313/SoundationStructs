@@ -34,6 +34,8 @@ types:
         type: f4 #
       - id: rel
         type: f4 #*1000 ms
+      #- id: unk3
+      #  contents: [00, 00, 00, 00, 40, 6F, 12, 83, 3A, CD, CC, CC, 3D, 00, 00, 80, 3F, 66, 66, E6, 3E ]
   slst:
     seq:
       - id: header
@@ -61,23 +63,26 @@ types:
       - id: base_note
         type: u1
         if: _root.header.file_version < 2
-        
-      - id: unk_n1
-        size: 1
-        if: _root.header.file_version >= 2
-      - id: unk
-        size: 9
       - id: unk1
+        size: 9
+      - id: mult
+        type: u1
+        if: _root.header.file_version >= 2
+      - id: unk2_v2_3
         size: 3
         if: _root.header.file_version >= 2
       - id: rate
         type: u4le
-      - id: unk2
+      - id: unk3
         size: 1
       - id: smpl_count
         type: u4le
       - id: samples
-        size: smpl_count*2
+        type: 
+          switch-on: _root.header.file_version
+          cases:
+            1: sam_arr_v1
+            _: sam_arr_v2
   zlst:
     seq:
       - id: header
@@ -91,7 +96,8 @@ types:
   zone:
     seq:
       - id: header
-        contents: "ZONE"
+        #contents: "ZONE"
+        size: 4
       - id: related_sample
         type: u2
       #- id: unk
@@ -116,3 +122,11 @@ types:
       - id: unk4
         size: 1
         if: _root.header.file_version >= 2
+  sam_arr_v1:
+      seq:
+      - id: samples
+        size: _parent.smpl_count * 2
+  sam_arr_v2:
+      seq:
+      - id: samples
+        size: _parent.smpl_count * 2 * _parent.mult
